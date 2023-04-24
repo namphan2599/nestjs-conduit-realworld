@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
-import { ArticleEntity } from 'src/article/article.entity'
+import { Article } from 'src/article/article.entity'
 
 @Entity()
-export class UserEntity {
+export class User {
     @PrimaryGeneratedColumn()
     id: number
 
@@ -18,7 +18,7 @@ export class UserEntity {
     @Column({ default: '' })
     image: string
 
-    @OneToMany(type => ArticleEntity, article => article.author)
-    articles: ArticleEntity[];
+    @OneToMany(type => Article, article => article.author)
+    articles: Article[];
 
 }

@@ -10,11 +10,11 @@ import {
   BeforeUpdate,
 } from 'typeorm';
 
-import { UserEntity } from 'src/user/user.entity';
-import { CommentEntity } from 'src/comment/comment.entity';
+import { User } from 'src/user/user.entity';
+import { Comment } from 'src/comment/comment.entity';
 
 @Entity('article')
-export class ArticleEntity {
+export class Article {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -44,10 +44,10 @@ export class ArticleEntity {
   @Column('simple-array')
   tagList: string[];
 
-  @ManyToOne((type) => UserEntity, (user) => user.articles)
-  author: UserEntity;
+  @ManyToOne((type) => User, (user) => user.articles)
+  author: User;
 
-  @OneToMany((type) => CommentEntity, (comment) => comment.article, { eager: true })
+  @OneToMany((type) => Comment, (comment) => comment.article, { eager: true })
   @JoinColumn()
   comments: Comment[];
 
