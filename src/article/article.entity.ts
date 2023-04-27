@@ -45,7 +45,7 @@ export class Article {
   tagList: string[];
 
   @ManyToOne((type) => User, (user) => user.articles)
-  author: User;
+  authorId: number;
 
   @OneToMany((type) => Comment, (comment) => comment.article, { eager: true })
   @JoinColumn()

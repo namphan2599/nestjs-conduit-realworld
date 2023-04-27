@@ -18,7 +18,7 @@ export class User {
     @Column({ default: '' })
     image: string
 
-    @OneToMany(type => Article, article => article.author)
+    @OneToMany(type => Article, article => article.authorId)
     articles: Article[];
 
 }
