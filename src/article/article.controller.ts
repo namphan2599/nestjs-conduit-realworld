@@ -11,8 +11,9 @@ export class ArticleController {
 
     constructor(private articleService: ArticleService) {}
 
-    @SkipAuth()
+    
     @Get()
+    @SkipAuth()
     getAllArticle() {
         return this.articleService.getAllArticle();
     }
@@ -27,5 +28,18 @@ export class ArticleController {
     @Put(':slug')
     updateArticle(@Param() params, @Body() articleData) {
         return this.articleService.updateArticle(articleData.title, articleData.body, params.slug);
+    }
+
+    @Post(':slug/comments')
+    createComment(@Req() req, @Param() params, @Body() commentData) {
+
+        console.log(params);
+
+        return this.articleService.createComment(params.slug , req['user'].sub ,commentData);
+    }
+
+    @Get('/test')
+    test() {
+        return this.articleService.getArticleByAuthor('namphan');
     }
 }

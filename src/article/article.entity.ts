@@ -45,7 +45,7 @@ export class Article {
   tagList: string[];
 
   @ManyToOne((type) => User, (user) => user.articles)
-  authorId: number;
+  author: User;
 
   @OneToMany((type) => Comment, (comment) => comment.article, { eager: true })
   @JoinColumn()
@@ -53,4 +53,17 @@ export class Article {
 
   @Column({ default: 0 })
   favoriteCount: number;
+
+  toJSON() {
+    return {
+      slug: this.slug,
+      title: this.title,
+      description: this.description,
+      body: this.body,
+      tagList: this.tagList,
+      author: this.author && this.author.toJSON(),
+      created: this.created,
+      updated: this.updated,
+    }
+  }
 }

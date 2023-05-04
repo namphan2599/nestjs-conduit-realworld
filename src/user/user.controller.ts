@@ -11,24 +11,24 @@ class TestDTO {
 
 @Controller('user')
 export class UserController {
-    
-    constructor(private userService: UserService) {}
+	
+	constructor(private userService: UserService) {}
 
-    @Post()
-    async register(@Body() bd: CreateUserDto) {
-        console.log(bd);
-        const rs = await this.userService.create(bd);
+	@Post()
+	async register(@Body() bd: CreateUserDto) {
+		console.log(bd);
+		const rs = await this.userService.create(bd);
 
-        return rs;
-    }
+		return rs;
+	}
 
-    @Post('/test')
-    async test(@Body() bd: TestDTO) {
-        
-        const rs = await this.userService.test(bd.username, bd.userpass);
-        
-        console.log(rs);
+	@Post('/test')
+	async test(@Body() bd: TestDTO) {
+			
+		const rs = await this.userService.test(bd.username, bd.userpass);
+		
+		console.log(rs);
 
-        return { yes: 'yes'};
-    }
+		return { yes: 'yes'};
+	}
 }

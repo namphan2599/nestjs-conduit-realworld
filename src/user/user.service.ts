@@ -28,6 +28,7 @@ export class UserService {
         let newUser = new User();
         newUser.username = user.username;
         newUser.password = await bcrypt.hash(user.password, saltRound);
+        newUser.articles = [];
 
         const savedUser = await this.userRepository.save(newUser);
 
