@@ -8,6 +8,7 @@ import {
   JoinColumn,
   AfterUpdate,
   BeforeUpdate,
+  ManyToMany,
 } from 'typeorm';
 
 import { User } from 'src/user/user.entity';
@@ -64,6 +65,7 @@ export class Article {
       author: this.author && this.author.toJSON(),
       created: this.created,
       updated: this.updated,
-    }
+      favoriteCount: this.favoriteCount,
+    };
   }
 }

@@ -1,36 +1,47 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm'
-import { Article } from 'src/article/article.entity'
-import { Comment } from 'src/comment/comment.entity'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  JoinTable,
+  ManyToMany,
+} from 'typeorm';
+import { Article } from 'src/article/article.entity';
+import { Comment } from 'src/comment/comment.entity';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    username: string
+  @Column()
+  username: string;
 
-    @Column()
-    password: string
+  @Column()
+  password: string;
 
-    @Column({ default: '' })
-    bio: string
+  @Column({ default: '' })
+  bio: string;
 
-    @Column({ default: '' })
-    image: string
+  @Column({ default: '' })
+  image: string;
 
-    @OneToMany(type => Article, article => article.author)
-    articles: Article[];
+  @OneToMany((type) => Article, (article) => article.author)
+  articles: Article[];
 
-    @OneToMany(() => Comment, (comment: Comment) => comment.author)
-    comments: Comment[];
+  @ManyToMany((type) => Article)
+  @JoinTable()
+  favorites: Article[];
 
-    toJSON() {
-        return {
-            id: this.id,
-            bio: this.bio,
-            image: this.image,
-        }
-    }
+  @OneToMany(() => Comment, (comment: Comment) => comment.author)
+  comments: Comment[];
 
+  toJSON() {
+    return {
+      id: this.id,
+      bio: this.bio,
+      image: this.image,
+      favorites: this.favorites ?? [],
+    };
+  }
 }
