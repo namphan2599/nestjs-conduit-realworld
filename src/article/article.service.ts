@@ -4,6 +4,7 @@ import { Article } from './article.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity';
 import { Comment } from 'src/comment/comment.entity';
+import { Follow } from 'src/follow/follow.entity';
 var slugify = require('slug');
 
 @Injectable()
@@ -12,10 +13,33 @@ export class ArticleService {
     @InjectRepository(Article) private articleRepository: Repository<Article>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    @InjectRepository(Follow) private followRepository: Repository<Follow>,
   ) {}
 
   async getAllArticle() {
     return await this.articleRepository.find();
+  }
+
+  async getFeed(userId: number) {
+    const follows = await this.followRepository.find({
+      where: { followerId: userId },
+    });
+
+    if (follows.length === 0) {
+      return { articles: [], articlesCount: 0 };
+    }
+
+    const ids = follows.map((follow) => follow.followingId);
+
+    const articles = await this.articleRepository
+      .createQueryBuilder()
+      .where('article.authorId in (:ids)', { ids })
+      .orderBy('article.created', 'DESC')
+      .getMany();
+
+    console.log(articles);
+
+    return {articles: articles, articlesCount: articles.length};
   }
 
   async createArticle(title, body, authorId) {

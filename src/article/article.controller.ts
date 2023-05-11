@@ -25,9 +25,14 @@ export class ArticleController {
     return this.articleService.getAllArticle();
   }
 
+  @Get('/feed')
+  getFeed(@Req() req) {
+    return this.articleService.getFeed(req['user'].sub);
+  }
+
   @Get(':slug')
   @SkipAuth()
-  async getArticleBySlug(@Param('slug') slug) {
+  async findOne(@Param('slug') slug) {
     const article = await this.articleService.findOne(slug);
 
     if (!article) {
@@ -39,8 +44,6 @@ export class ArticleController {
 
   @Post()
   createArticle(@Req() req, @Body() articleData) {
-    console.log(req['user']);
-    console.log(articleData);
     return this.articleService.createArticle(
       articleData.title,
       articleData.body,
