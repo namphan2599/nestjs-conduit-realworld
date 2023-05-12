@@ -13,6 +13,7 @@ import {
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipAuth } from 'src/auth/decorators/SkipAuth.decorator';
 import { ArticleService } from './article.service';
+import { User } from 'src/decorators/user.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('article')
@@ -26,8 +27,8 @@ export class ArticleController {
   }
 
   @Get('/feed')
-  getFeed(@Req() req) {
-    return this.articleService.getFeed(req['user'].sub);
+  getFeed(@User('id') userId) {
+    return this.articleService.getFeed(userId);
   }
 
   @Get(':slug')
@@ -43,11 +44,11 @@ export class ArticleController {
   }
 
   @Post()
-  createArticle(@Req() req, @Body() articleData) {
+  createArticle(@User('id') userId, @Body() articleData) {
     return this.articleService.createArticle(
       articleData.title,
       articleData.body,
-      req['user'].sub,
+      userId,
     );
   }
 
@@ -61,22 +62,22 @@ export class ArticleController {
   }
 
   @Post(':slug/comments')
-  createComment(@Req() req, @Param('slug') slug, @Body() commentData) {
+  createComment(@User('id') userId, @Param('slug') slug, @Body() commentData) {
     return this.articleService.createComment(
       slug,
-      req['user'].sub,
+      userId,
       commentData,
     );
   }
 
   @Post(':slug/favorite')
-  favorite(@Req() req, @Param('slug') slug) {
-    return this.articleService.favorite(slug, req['user'].sub);
+  favorite(@User('id') userId, @Param('slug') slug) {
+    return this.articleService.favorite(slug, userId);
   }
 
   @Delete(':slug/favorite')
-  unfavorite(@Req() req, @Param('slug') slug) {
-    return this.articleService.unfavorite(slug, req['user'].sub);
+  unfavorite(@User('id') userId, @Param('slug') slug) {
+    return this.articleService.unfavorite(slug, userId);
   }
 
   @Get('/test')

@@ -2,6 +2,7 @@ import { Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/co
 import { ProfileService } from './profile.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipAuth } from 'src/auth/decorators/SkipAuth.decorator';
+import { User } from 'src/decorators/user.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('profile')
@@ -10,22 +11,17 @@ export class ProfileController {
 
   @SkipAuth()
   @Get(':username')
-  getProfile(@Req() req, @Param('username') usernameToFollow) {
-    console.log(req['user'])
-    let userId = null;
-    if(req['user']) {
-      userId = req['user'].sub;
-    }
+  getProfile(@User('id') userId, @Param('username') usernameToFollow) {
     return this.profileService.findProfile(userId, usernameToFollow);
   }
 
   @Post(':username/follow')
-  follow(@Req() req, @Param('username') usernameToFollow) {
-    return this.profileService.follow(req['user'].sub, usernameToFollow);
+  follow(@User('id') userId, @Param('username') usernameToFollow) {
+    return this.profileService.follow(userId, usernameToFollow);
   }
 
   @Delete(':username/follow')
-  unfollow(@Req() req, @Param('username') usernameToUnfollow) {
-    return this.profileService.unfollow(req['user'].sub, usernameToUnfollow);
+  unfollow(@User('id') userId, @Param('username') usernameToUnfollow) {
+    return this.profileService.unfollow(userId, usernameToUnfollow);
   }
 }
