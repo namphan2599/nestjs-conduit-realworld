@@ -14,6 +14,9 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { SkipAuth } from 'src/auth/decorators/SkipAuth.decorator';
 import { ArticleService } from './article.service';
 import { User } from 'src/decorators/user.decorator';
+import CreateCommentDto from './dto/create-comment.dto';
+import CreateArticleDto from './dto/create-article.dto';
+import UpdateArticleDto from './dto/update-article.dto';
 
 @UseGuards(AuthGuard)
 @Controller('article')
@@ -44,25 +47,17 @@ export class ArticleController {
   }
 
   @Post()
-  createArticle(@User('id') userId, @Body() articleData) {
-    return this.articleService.createArticle(
-      articleData.title,
-      articleData.body,
-      userId,
-    );
+  createArticle(@User('id') userId, @Body() createData: CreateArticleDto) {
+    return this.articleService.createArticle(userId, createData);
   }
 
   @Put(':slug')
-  updateArticle(@Param('slug') slug, @Body() articleData) {
-    return this.articleService.updateArticle(
-      articleData.title,
-      articleData.body,
-      slug,
-    );
+  updateArticle(@Param('slug') slug, @Body() updateData: UpdateArticleDto) {
+    return this.articleService.updateArticle(slug, updateData);
   }
 
   @Post(':slug/comments')
-  createComment(@User('id') userId, @Param('slug') slug, @Body() commentData) {
+  createComment(@User('id') userId, @Param('slug') slug, @Body() commentData: CreateCommentDto) {
     return this.articleService.createComment(
       slug,
       userId,

@@ -5,6 +5,9 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity';
 import { Comment } from 'src/comment/comment.entity';
 import { Follow } from 'src/follow/follow.entity';
+import CreateCommentDto from './dto/create-comment.dto';
+import CreateArticleDto from './dto/create-article.dto';
+import UpdateArticleDto from './dto/update-article.dto';
 var slugify = require('slug');
 
 @Injectable()
@@ -42,7 +45,7 @@ export class ArticleService {
     return {articles: articles, articlesCount: articles.length};
   }
 
-  async createArticle(title, body, authorId) {
+  async createArticle(authorId: number, createData: CreateArticleDto) {
     const author = await this.userRepository.findOneBy({ id: authorId });
 
     if (!author) {
@@ -53,10 +56,11 @@ export class ArticleService {
     }
 
     let newArticle = new Article();
-    newArticle.title = title;
-    newArticle.body = body;
+
+    newArticle.title = createData.title;
+    newArticle.body = createData.body;
     // should use uuid or something instead of Date.now
-    newArticle.slug = slugify(title) + '-' + Date.now();
+    newArticle.slug = slugify(createData.title) + '-' + Date.now();
     newArticle.tagList = [];
     newArticle.comments = [];
 
@@ -66,6 +70,7 @@ export class ArticleService {
       where: { id: authorId },
       relations: { articles: true },
     });
+
     user.articles.push(newArticle);
 
     await this.userRepository.save(user);
@@ -73,7 +78,7 @@ export class ArticleService {
     return savedArticle;
   }
 
-  async updateArticle(newTitle, newBody, slug: string) {
+  async updateArticle(slug: string, updateData: UpdateArticleDto) {
     const article = await this.articleRepository.findOne({
       where: { slug: slug },
     });
@@ -85,9 +90,9 @@ export class ArticleService {
       };
     }
 
-    article.title = newTitle;
-    article.body = newBody;
-    article.slug = slugify(newTitle) + '-' + slug.split('-').pop();
+    article.title = updateData.title;
+    article.body = updateData.body;
+    article.slug = slugify(updateData.title) + '-' + slug.split('-').pop();
 
     return this.articleRepository.save(article);
   }
@@ -107,7 +112,7 @@ export class ArticleService {
     return this.articleRepository.findOneBy({ slug: slug });
   }
 
-  async createComment(slug, userID, commentData) {
+  async createComment(slug: string, userID: number, commentData: CreateCommentDto) {
     const author = await this.userRepository.findOneBy({ id: userID });
     const article = await this.articleRepository.findOneBy({ slug: slug });
 
