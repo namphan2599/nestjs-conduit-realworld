@@ -39,6 +39,7 @@ export class User {
   toJSON() {
     return {
       id: this.id,
+      username: this.username,
       bio: this.bio,
       image: this.image,
       favorites: this.favorites ?? [],

@@ -20,7 +20,10 @@ export class ArticleService {
   ) {}
 
   async getAllArticle() {
-    return await this.articleRepository.find();
+    return await this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
+      .getMany();
   }
 
   async getFeed(userId: number) {
@@ -35,14 +38,15 @@ export class ArticleService {
     const ids = follows.map((follow) => follow.followingId);
 
     const articles = await this.articleRepository
-      .createQueryBuilder()
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
       .where('article.authorId in (:ids)', { ids })
       .orderBy('article.created', 'DESC')
       .getMany();
 
     console.log(articles);
 
-    return {articles: articles, articlesCount: articles.length};
+    return { articles: articles, articlesCount: articles.length };
   }
 
   async createArticle(authorId: number, createData: CreateArticleDto) {
@@ -109,10 +113,18 @@ export class ArticleService {
   }
 
   async findOne(slug: string) {
-    return this.articleRepository.findOneBy({ slug: slug });
+    return this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
+      .where('article.slug = :slug', { slug: slug})
+      .getOne();
   }
 
-  async createComment(slug: string, userID: number, commentData: CreateCommentDto) {
+  async createComment(
+    slug: string,
+    userID: number,
+    commentData: CreateCommentDto,
+  ) {
     const author = await this.userRepository.findOneBy({ id: userID });
     const article = await this.articleRepository.findOneBy({ slug: slug });
 
