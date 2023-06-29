@@ -31,11 +31,11 @@ export class UserService {
     newUser.articles = [];
     newUser.favorites = [];
 
-    const savedUser = await this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
 
-    let { password, ...result } = savedUser;
-
-    return result;
+    return {
+      status: 'ok'
+    };
   }
 
   findOne(username: string): Promise<User | null> {
