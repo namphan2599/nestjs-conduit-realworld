@@ -32,7 +32,7 @@ export class AuthService {
     const payload = { username: user.username, sub: user.id };
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '1m',
+      expiresIn: '1h',
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
@@ -52,7 +52,7 @@ export class AuthService {
         },
       );
 
-      return await this.jwtService.signAsync(payload, {expiresIn: '1m'});
+      return await this.jwtService.signAsync(payload, {expiresIn: '15s'});
     } catch (err) {
       console.log(err);
       throw new UnauthorizedException();

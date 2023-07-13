@@ -20,10 +20,12 @@ export class ArticleService {
   ) {}
 
   async getAllArticle() {
-    return await this.articleRepository
+    const articles = await this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author')
       .getMany();
+    
+    return { articles: articles, articlesCount: articles.length };
   }
 
   async getFeed(userId: number) {
@@ -43,8 +45,6 @@ export class ArticleService {
       .where('article.authorId in (:ids)', { ids })
       .orderBy('article.created', 'DESC')
       .getMany();
-
-    console.log(articles);
 
     return { articles: articles, articlesCount: articles.length };
   }

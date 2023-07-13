@@ -42,7 +42,6 @@ export class User {
       username: this.username,
       bio: this.bio,
       image: this.image,
-      favorites: this.favorites ?? [],
     };
   }
 }

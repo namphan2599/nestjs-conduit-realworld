@@ -17,7 +17,7 @@ import { Request, Response } from 'express';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/signInTest')
+  @Post('/signIn')
   async signIn(@Res({ passthrough: true }) res: Response, @Body() bd: AuthUserLoginDto) {
     const { accessToken, refreshToken } = await this.authService.signToken(bd.username, bd.password);
     
@@ -26,7 +26,8 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, { 
       expires: expireDate,
-      httpOnly: true
+      httpOnly: true,
+      sameSite: 'none'
     })
 
     return {
@@ -34,7 +35,7 @@ export class AuthController {
     }
   }
 
-  @Post('/refreshToken')
+  @Get('/refreshToken')
   async refreshToken(@Req() req: Request) {
     const token = req.cookies['refreshToken'];
     return this.authService.refreshToken(token);
