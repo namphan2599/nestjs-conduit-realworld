@@ -19,13 +19,28 @@ export class ArticleService {
     @InjectRepository(Follow) private followRepository: Repository<Follow>,
   ) {}
 
-  async getAllArticle() {
-    const articles = await this.articleRepository
+  async getAllArticle(query) {
+    const limit = 5;
+    const queryBuild = await this.articleRepository
       .createQueryBuilder('article')
-      .leftJoinAndSelect('article.author', 'author')
-      .getMany();
+      .leftJoinAndSelect('article.author', 'author');
+
+    const articlesCount = await queryBuild.getCount();
+
+    queryBuild.where('1=1');
+  
+    if('page' in query) {
+      queryBuild.skip(limit * (parseInt(query.page) - 1))
+    }
+
+    queryBuild.take(limit)
+
+    const articles = await queryBuild.getMany()
     
-    return { articles: articles, articlesCount: articles.length };
+    return { 
+      articles, 
+      articlesCount
+     };
   }
 
   async getFeed(userId: number) {

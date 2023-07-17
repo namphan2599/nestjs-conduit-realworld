@@ -5,6 +5,7 @@ import {
   Body,
   Post,
   Req,
+  Query,
   Put,
   Delete,
   Param,
@@ -25,8 +26,8 @@ export class ArticleController {
 
   @Get()
   @SkipAuth()
-  getAllArticle() {
-    return this.articleService.getAllArticle();
+  getAllArticle(@Query() query) {
+    return this.articleService.getAllArticle(query);
   }
 
   @Get('/feed')
