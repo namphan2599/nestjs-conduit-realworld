@@ -28,19 +28,21 @@ export class ArticleService {
     const articlesCount = await queryBuild.getCount();
 
     queryBuild.where('1=1');
-  
-    if('page' in query) {
-      queryBuild.skip(limit * (parseInt(query.page) - 1))
+
+    if ('page' in query) {
+      queryBuild.skip(limit * (parseInt(query.page) - 1));
     }
 
-    queryBuild.take(limit)
+    queryBuild.take(limit);
 
-    const articles = await queryBuild.getMany()
-    
-    return { 
-      articles, 
-      articlesCount
-     };
+    const articles = await queryBuild
+      .orderBy('article.created', 'DESC')
+      .getMany();
+
+    return {
+      articles,
+      articlesCount,
+    };
   }
 
   async getFeed(userId: number) {
@@ -131,7 +133,7 @@ export class ArticleService {
     return this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author')
-      .where('article.slug = :slug', { slug: slug})
+      .where('article.slug = :slug', { slug: slug })
       .getOne();
   }
 
