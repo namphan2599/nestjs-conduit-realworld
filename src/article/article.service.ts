@@ -25,13 +25,34 @@ export class ArticleService {
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author');
 
-    const articlesCount = await queryBuild.getCount();
-
     queryBuild.where('1=1');
 
     if ('page' in query) {
       queryBuild.skip(limit * (parseInt(query.page) - 1));
     }
+
+    if ('author' in query) {
+      const author = await this.userRepository.findOneBy({
+        username: query.author,
+      });
+      
+      queryBuild.andWhere('article.authorId = :authorId', {
+        authorId: author.id,
+      });
+    }
+
+    if ('favorite' in query) {
+      const author = await this.userRepository.findOne({
+        where: { username: query.favorite },
+        relations: { favorites: true },
+      });
+
+      const favoriteIds = author.favorites.map(el => el.id)
+
+      queryBuild.andWhere('article.id IN (:ids)', {ids: favoriteIds})
+    }
+
+    const articlesCount = await queryBuild.getCount();
 
     queryBuild.take(limit);
 
