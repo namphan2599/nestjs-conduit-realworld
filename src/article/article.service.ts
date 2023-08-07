@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './article.entity';
 import { Repository } from 'typeorm';
@@ -35,7 +35,7 @@ export class ArticleService {
       const author = await this.userRepository.findOneBy({
         username: query.author,
       });
-      
+
       queryBuild.andWhere('article.authorId = :authorId', {
         authorId: author.id,
       });
@@ -47,9 +47,9 @@ export class ArticleService {
         relations: { favorites: true },
       });
 
-      const favoriteIds = author.favorites.map(el => el.id)
+      const favoriteIds = author.favorites.map((el) => el.id);
 
-      queryBuild.andWhere('article.id IN (:ids)', {ids: favoriteIds})
+      queryBuild.andWhere('article.id IN (:ids)', { ids: favoriteIds });
     }
 
     const articlesCount = await queryBuild.getCount();
@@ -212,6 +212,27 @@ export class ArticleService {
     }
 
     return article;
+  }
+
+  async deleteArticle(userId: number, slug: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: { favorites: true },
+    });
+    const article = await this.articleRepository.findOneBy({ slug });
+
+    if (!user || !article) {
+      throw new NotFoundException('User or article not found');
+    }
+
+    let deleteIndex = user.favorites.findIndex(
+      (article) => article.slug === slug,
+    );
+    user.favorites.splice(deleteIndex, 1);
+    this.userRepository.save(user);
+
+    const result = await this.articleRepository.remove(article);
+    return result;
   }
 
   async unfavorite(slug: string, userId: number) {

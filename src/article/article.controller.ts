@@ -67,13 +67,18 @@ export class ArticleController {
   }
 
   @Post(':slug/favorite')
-  favorite(@User('id') userId, @Param('slug') slug) {
+  favorite(@User('id') userId, @Param('slug') slug: string) {
     return this.articleService.favorite(slug, userId);
   }
 
   @Delete(':slug/favorite')
-  unfavorite(@User('id') userId, @Param('slug') slug) {
+  unfavorite(@User('id') userId, @Param('slug') slug: string) {
     return this.articleService.unfavorite(slug, userId);
+  }
+
+  @Delete(':slug')
+  deleteArticle(@User('id') userId: number, @Param('slug') slug: string) {
+    return this.articleService.deleteArticle(userId, slug)
   }
 
   @Get('/test')
