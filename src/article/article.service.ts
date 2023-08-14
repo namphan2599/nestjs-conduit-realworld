@@ -101,6 +101,7 @@ export class ArticleService {
 
     newArticle.title = createData.title;
     newArticle.body = createData.body;
+    newArticle.description = createData.description;
     // should use uuid or something instead of Date.now
     newArticle.slug = slugify(createData.title) + '-' + Date.now();
     newArticle.tagList = [];
@@ -134,6 +135,7 @@ export class ArticleService {
 
     article.title = updateData.title;
     article.body = updateData.body;
+    article.description = updateData.description;
     article.slug = slugify(updateData.title) + '-' + slug.split('-').pop();
 
     return this.articleRepository.save(article);
