@@ -27,7 +27,6 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, { 
       expires: expireDate,
       httpOnly: true,
-      sameSite: 'none'
     })
 
     return {

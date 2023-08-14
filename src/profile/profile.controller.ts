@@ -11,17 +11,17 @@ export class ProfileController {
 
   @SkipAuth()
   @Get(':username')
-  getProfile(@User('id') userId, @Param('username') usernameToFollow) {
+  getProfile(@User('id') userId: number, @Param('username') usernameToFollow) {
     return this.profileService.findProfile(userId, usernameToFollow);
   }
 
   @Post(':username/follow')
-  follow(@User('id') userId, @Param('username') usernameToFollow) {
+  follow(@User('id') userId: number, @Param('username') usernameToFollow) {
     return this.profileService.follow(userId, usernameToFollow);
   }
 
-  @Delete(':username/follow')
-  unfollow(@User('id') userId, @Param('username') usernameToUnfollow) {
+  @Delete(':username/unfollow')
+  unfollow(@User('id') userId: number, @Param('username') usernameToUnfollow) {
     return this.profileService.unfollow(userId, usernameToUnfollow);
   }
 }
