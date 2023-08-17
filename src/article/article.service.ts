@@ -49,17 +49,21 @@ export class ArticleService {
 
       const favoriteIds = author.favorites.map((el) => el.id);
 
-      queryBuild.andWhere('article.id IN (:ids)', { ids: favoriteIds });
+      if(favoriteIds.length === 0) {
+        return { articles: [], articlesCount: 0 };
+      }
+
+      queryBuild.andWhere('article.id IN (:...ids)', { ids: favoriteIds });
     }
-
+    
     const articlesCount = await queryBuild.getCount();
-
+    
     queryBuild.take(limit);
-
+    
     const articles = await queryBuild
-      .orderBy('article.created', 'DESC')
-      .getMany();
-
+    .orderBy('article.created', 'DESC')
+    .getMany();
+  
     return {
       articles,
       articlesCount,
