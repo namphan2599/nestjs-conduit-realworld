@@ -8,6 +8,7 @@ import { Follow } from 'src/follow/follow.entity';
 import CreateCommentDto from './dto/create-comment.dto';
 import CreateArticleDto from './dto/create-article.dto';
 import UpdateArticleDto from './dto/update-article.dto';
+import { ArticleRO } from './article.interface';
 var slugify = require('slug');
 
 @Injectable()
@@ -49,21 +50,21 @@ export class ArticleService {
 
       const favoriteIds = author.favorites.map((el) => el.id);
 
-      if(favoriteIds.length === 0) {
+      if (favoriteIds.length === 0) {
         return { articles: [], articlesCount: 0 };
       }
 
       queryBuild.andWhere('article.id IN (:...ids)', { ids: favoriteIds });
     }
-    
+
     const articlesCount = await queryBuild.getCount();
-    
+
     queryBuild.take(limit);
-    
+
     const articles = await queryBuild
-    .orderBy('article.created', 'DESC')
-    .getMany();
-  
+      .orderBy('article.created', 'DESC')
+      .getMany();
+
     return {
       articles,
       articlesCount,
@@ -156,12 +157,31 @@ export class ArticleService {
     return rs;
   }
 
-  async findOne(slug: string) {
-    return this.articleRepository
+  async findOne(slug: string, userId?: number) {
+    const article = await this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author')
       .where('article.slug = :slug', { slug: slug })
       .getOne();
+
+    const articleRO: ArticleRO = {
+      ...article.toJSON(),
+      favorited: false,
+    };
+
+    if (userId) {
+      const user = await this.userRepository.findOne({
+        where: {
+          id: userId,
+        },
+        relations: { favorites: true },
+      });
+
+      articleRO.favorited =
+        user.favorites.findIndex((article) => article.slug === slug) >= 0;
+    }
+
+    return articleRO;
   }
 
   async createComment(
@@ -195,7 +215,15 @@ export class ArticleService {
       },
       relations: { favorites: true },
     });
-    let article = await this.articleRepository.findOneBy({ slug: slug });
+
+    let article = await this.articleRepository.findOne({
+      where: {
+        slug: slug,
+      },
+      relations: {
+        author: true,
+      },
+    });
 
     if (!user.favorites) {
       user.favorites = [];
@@ -206,18 +234,66 @@ export class ArticleService {
         (favoriteArticle) => favoriteArticle.id === article.id,
       ) < 0;
 
+    let authorInfo = article.author;
+
     if (isNewFavorite) {
       user.favorites.push(article);
       article.favoriteCount++;
 
-      let savedUser = await this.userRepository.save(user);
-
-      console.log(savedUser);
+      await this.userRepository.save(user);
 
       article = await this.articleRepository.save(article);
     }
 
-    return article;
+    const articleRO: ArticleRO = {
+      ...article.toJSON(),
+      author: authorInfo,
+      favorited: true,
+    };
+
+    return articleRO;
+  }
+
+   // need to do something with this
+   async unfavorite(slug: string, userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      relations: { favorites: true },
+    });
+
+    let article = await this.articleRepository.findOne({
+      where: {
+        slug: slug,
+      },
+      relations: {
+        author: true,
+      },
+    });
+
+    const deleteIndex = user.favorites.findIndex(
+      (favoriteArticle) => favoriteArticle.id === article.id,
+    );
+
+    let authorInfo = article.author;
+
+    if (deleteIndex >= 0) {
+      user.favorites.splice(deleteIndex, 1);
+      article.favoriteCount--;
+
+      await this.userRepository.save(user);
+
+      article = await this.articleRepository.save(article);
+    }
+
+    const articleRO: ArticleRO = {
+      ...article.toJSON(),
+      author: authorInfo,
+      favorited: false,
+    };
+
+    return articleRO;
   }
 
   async deleteArticle(userId: number, slug: string) {
@@ -239,32 +315,5 @@ export class ArticleService {
 
     const result = await this.articleRepository.remove(article);
     return result;
-  }
-
-  async unfavorite(slug: string, userId: number) {
-    const user = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-      relations: { favorites: true },
-    });
-
-    console.log(user);
-    let article = await this.articleRepository.findOneBy({ slug: slug });
-
-    const deleteIndex = user.favorites.findIndex(
-      (favoriteArticle) => favoriteArticle.id === article.id,
-    );
-
-    if (deleteIndex >= 0) {
-      user.favorites.splice(deleteIndex, 1);
-      article.favoriteCount--;
-
-      await this.userRepository.save(user);
-
-      article = await this.articleRepository.save(article);
-    }
-
-    return article;
   }
 }

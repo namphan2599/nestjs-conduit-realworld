@@ -37,8 +37,8 @@ export class ArticleController {
 
   @Get(':slug')
   @SkipAuth()
-  async findOne(@Param('slug') slug) {
-    const article = await this.articleService.findOne(slug);
+  async findOne(@Param('slug') slug, @User('id') userId: number) {
+    const article = await this.articleService.findOne(slug, userId);
 
     if (!article) {
       throw new NotFoundException('Article does not exist.');

@@ -5,7 +5,6 @@ import { Comment } from 'src/comment/comment.entity';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
 import { AuthModule } from 'src/auth/auth.module';
-import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/user.entity';
 import { Follow } from 'src/follow/follow.entity';
 
