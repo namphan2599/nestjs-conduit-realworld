@@ -1,8 +1,8 @@
 import { Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { SkipAuth } from 'src/auth/decorators/SkipAuth.decorator';
-import { User } from 'src/decorators/user.decorator';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { SkipAuth } from 'src/shared/decorators/SkipAuth.decorator';
+import { User } from 'src/shared/decorators/user.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('profile')

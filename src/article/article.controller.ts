@@ -11,10 +11,10 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { SkipAuth } from 'src/auth/decorators/SkipAuth.decorator';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { SkipAuth } from 'src/shared/decorators/SkipAuth.decorator';
 import { ArticleService } from './article.service';
-import { User } from 'src/decorators/user.decorator';
+import { User } from 'src/shared/decorators/user.decorator';
 import CreateCommentDto from './dto/create-comment.dto';
 import CreateArticleDto from './dto/create-article.dto';
 import UpdateArticleDto from './dto/update-article.dto';

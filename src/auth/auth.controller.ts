@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import AuthUserLoginDto from './dto/auth-user-login';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 import { Request, Response } from 'express';
 
 @Controller('auth')
