@@ -81,6 +81,17 @@ export class ArticleController {
     return this.articleService.deleteArticle(userId, slug)
   }
 
+  @SkipAuth()
+  @Get(':slug/comments')
+  getCommentsByArticle(@Param('slug') slug: string) {
+    return this.articleService.getCommentsByArticle(slug);
+  }
+
+  @Delete(':slug/comments/:id')
+  deleteComment(@User('id') userId: number, @Param('slug') slug: string, @Param('id') id: number) {
+    return this.articleService.deleteComment(userId, slug, id);
+  }
+
   @Get('/test')
   test() {
     return this.articleService.getArticleByAuthor('namphan');

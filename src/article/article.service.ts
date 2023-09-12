@@ -96,10 +96,7 @@ export class ArticleService {
     const author = await this.userRepository.findOneBy({ id: authorId });
 
     if (!author) {
-      return {
-        status: 'error',
-        mess: 'User not found',
-      };
+      new NotFoundException('User not found.')
     }
 
     let newArticle = new Article();
@@ -132,10 +129,7 @@ export class ArticleService {
     });
 
     if (!article) {
-      return {
-        status: 'error',
-        mess: 'Article not found.',
-      };
+      new NotFoundException('Article not found.')
     }
 
     article.title = updateData.title;
@@ -206,6 +200,41 @@ export class ArticleService {
     const savedComment = await this.commentRepository.save(newComment);
 
     return savedComment;
+  }
+
+  async getCommentsByArticle(slug: string) {
+    const article = await this.articleRepository.findOne({
+      where: {
+        slug: slug
+      }
+    });
+
+    return article.comments;
+  }
+
+  async deleteComment(userId: number, slug: string, id: number) {
+    const comment = await this.commentRepository.findOne({
+      where: {
+        id: id,
+        article: {
+          slug
+        },
+        author: {
+          id: userId
+        }
+      },
+    });
+
+    console.log(comment)
+
+    if(!comment) {
+      console.log(comment)
+      throw new NotFoundException('Comment not found.');
+    }
+
+    const deletedComment = await this.commentRepository.remove(comment);
+
+    return deletedComment;
   }
 
   async favorite(slug: string, userId: number) {
