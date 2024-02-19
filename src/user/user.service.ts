@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -19,8 +19,7 @@ export class UserService {
     });
 
     if (existedUser) {
-      console.log(existedUser);
-      return { status: 'error', mess: 'This name already used.' };
+      throw new BadRequestException('The name is in use');
     }
 
     let saltRound = 10;
@@ -34,7 +33,7 @@ export class UserService {
     await this.userRepository.save(newUser);
 
     return {
-      status: 'ok'
+      status: 'ok',
     };
   }
 
