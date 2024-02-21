@@ -10,8 +10,7 @@ export const User = createParamDecorator(
     // for protected routes
     if (user) {
       userId = user.sub;
-
-      return data ? userId : user;
+      return data === 'id' ? userId : user.username;
     }
 
     // in case we need userID without guard
@@ -19,7 +18,7 @@ export const User = createParamDecorator(
       ? (request.headers.authorization as string).split(' ')
       : null;
 
-    if(token) {
+    if (token) {
       const decodedPayload = jwt.verify(token[1], process.env.JWT_SECRET);
       userId = decodedPayload.sub;
     }

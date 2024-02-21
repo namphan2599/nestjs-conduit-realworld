@@ -1,34 +1,52 @@
-import { Controller, Get, Req, Body, Post } from '@nestjs/common';
-import { Request } from 'express';
-import { User } from './user.entity';
+import {
+  Controller,
+  Get,
+  Req,
+  Body,
+  Post,
+  UseGuards,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import CreateUserDto from './dto/user-create';
+import { User } from 'src/shared/decorators/user.decorator';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { SkipAuth } from 'src/shared/decorators/SkipAuth.decorator';
+import UpdateUserDto from './dto/user-update';
 
 class TestDTO {
-    username: string;
-    userpass: string;
+  username: string;
+  userpass: string;
 }
 
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
-	
-	constructor(private userService: UserService) {}
+  constructor(private userService: UserService) {}
 
-	@Post()
-	async register(@Body() bd: CreateUserDto) {
-		console.log('create user', bd);
-		const rs = await this.userService.create(bd);
+  @Get()
+  async getUserInfo(@User('name') userName) {
+    return this.userService.findOne(userName);
+  }
 
-		return rs;
-	}
+  @SkipAuth()
+  @Post()
+  async register(@Body() bd: CreateUserDto) {
+    console.log('create user', bd);
+    return this.userService.create(bd);
+  }
 
-	@Post('/test')
-	async test(@Body() bd: TestDTO) {
-			
-		const rs = await this.userService.test(bd.username, bd.userpass);
-		
-		console.log(rs);
+  @Put()
+  async update(@User('id') userId, @Body() db: UpdateUserDto) {
+    return this.userService.update(userId, db);
+  }
 
-		return { yes: 'yes'};
-	}
+  @Post('/test')
+  async test(@Body() bd: TestDTO) {
+    const rs = await this.userService.test(bd.username, bd.userpass);
+
+    console.log(rs);
+
+    return { yes: 'yes' };
+  }
 }

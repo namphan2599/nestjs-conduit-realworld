@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import CreateUserDto from './dto/user-create';
 
 import * as bcrypt from 'bcrypt';
+import UpdateUserDto from './dto/user-update';
 
 @Injectable()
 export class UserService {
@@ -39,6 +44,19 @@ export class UserService {
 
   findOne(username: string): Promise<User | null> {
     return this.userRepository.findOneBy({ username });
+  }
+
+  async update(userId: number, updateDto: UpdateUserDto): Promise<User | null> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.bio = updateDto.bio;
+    // user.image = updateDto.image;
+
+    return this.userRepository.save(user);
   }
 
   test(username: string, userpass: string): Promise<User | null> {
